@@ -27,8 +27,8 @@ $(document).ready(function () {
             //     locations: {
             //         "location": ["id1", "id2"],
             //     },
-            //     categories: {
-            //         "category": ["id2", "id4"],
+            //     departments: {
+            //         "department": ["id2", "id4"],
             //     },
             //     posts: [{}, {}]
             // }
@@ -64,6 +64,7 @@ $(document).ready(function () {
 
             createJobsFromPostings(postings);
             activateButtonsFromPostings(".jobs-teams", "departments", postings);
+            activateButtonsFromPostings(".jobs-locations", "locations", postings);
         }
     });
 
@@ -107,14 +108,13 @@ function activateButtons(_data) {
 
 function activateButtonsFromPostings(selector, selectedJobsList, postings) {
     // TODO: check if the selected list is in the postings
-
     $(selector).on("click", "a", function (e) {
         e.preventDefault();
         var jobs = $(".jobs-list");
 
         for (let key in postings[selectedJobsList]) {
             key = cleanString(nullCheck(key))
-
+            console.log("key", key)
             if ($(this).hasClass(key)) {
                 if ($(this).hasClass("active")) {
                     $(this).removeClass("active");
@@ -122,14 +122,13 @@ function activateButtonsFromPostings(selector, selectedJobsList, postings) {
                 } else {
                     $(".jobs-teams").find("a").removeClass("active");
                     $(this).addClass("active");
+                    console.log("classes", jobs.find("." + key).attr("class"))
+                    jobs.find("." + key).fadeIn("fast");
+                    jobs
+                        .find(".job")
+                        .not("." + key)
+                        .fadeOut("fast");
                 }
-                console.log("key", key)
-                console.log($(".jobs-list." + key))
-                jobs.find("." + key).fadeIn("fast");
-                jobs
-                    .find(".job")
-                    .not("." + key)
-                    .fadeOut("fast");
             }
 
         }
@@ -140,10 +139,12 @@ function activateButtonsFromPostings(selector, selectedJobsList, postings) {
 //Functions for checking if the variable is unspecified
 function cleanString(string) {
     if (string) {
-        var cleanString = string.replace(/[\s&]+/gi, (str) => {
+        var cleanString = string.replace(/[\s&,]+/gi, (str) => {
             switch (str) {
                 case "&":
                     return "Amp"
+                case ",":
+                    return "-"
                 default:
                     return ""
             }
@@ -169,15 +170,11 @@ function createJobsFromPostings(postings) {
 
     for (var department in postings.departments) {
 
-        // var team = nullCheck(id);
-        // var department = "";
-        var departmentCleanString = cleanString(nullCheck(department));
-        var location = "";
-        var locationCleanString = "";
+        var cleanStr = cleanString(nullCheck(department));
 
         let teamButton = `<p class="tags teamCategories" style="padding: 0px 20px; margin: 0px;">
             <span>
-                <a href="#" class="btn departmentFilterBtn ${departmentCleanString}">
+                <a href="#" class="btn departmentFilterBtn ${cleanStr}">
                     ${department}
                 </a>
             </span>
@@ -185,17 +182,26 @@ function createJobsFromPostings(postings) {
 
         //Display all job departments in the .jobs-teams div
         $(".jobs-teams").append(teamButton);
+    }
+
+    for (var location in postings.locations) {
+
+        // var team = nullCheck(id);
+        // var department = "";
+        var cleanStr = cleanString(nullCheck(location));
+
+        let teamButton = `<p class="tags teamCategories" style="padding: 0px 20px; margin: 0px;">
+            <span>
+                <a href="#" class="btn departmentFilterBtn ${cleanStr}">
+                    ${location}
+                </a>
+            </span>
+        </p>`
 
         //Display all job locations in the .jobs-teams div
-        // $(".jobs-locations").append(
-        //     '<p class="tags teamCategories" style="padding: 0px 20px; margin: 0px;"><span><a href="#" class="btn departmentFilterBtn ' +
-        //     locationCleanString +
-        //     '">' +
-        //     location +
-        //     "</a></span></p>"
-        // );
-
+        $(".jobs-locations").append(teamButton);
     }
+
 
     for (var id in postings.posts) {
 
@@ -209,7 +215,6 @@ function createJobsFromPostings(postings) {
                 .replace("\n", " ") + "...";
 
         var location = cleanString(nullCheck(posting.categories.location))
-        // var locationCleanString = cleanString(location);
         var commitment = cleanString(nullCheck(posting.categories.commitment))
         var team = cleanString(nullCheck(posting.categories.team))
 
@@ -217,30 +222,32 @@ function createJobsFromPostings(postings) {
 
         //Append each job posting to the #jobs div
         $("#jobs").append(
-            '<li class="job list-group-item jobListing ' +
-            team +
-            " " +
-            location +
-            " " +
-            commitment +
-            " " +
-            department + " " + id + " " +
-            '">' +
-            '<ul style="padding-left: 0px !important;">' +
-            '<li class="job-title list-group-item">' +
-            title +
-            "</li>" +
-            '<li class="tags"><span class="department list-group-item"><a style="color: #999;">' +
-            department +
-            "</a></span></li>" +
-            '<li class="tags"><span class="location list-group-item"><a style="color: #999;">' +
-            location +
-            "</a></span></li>" +
-            '<li class="description"><a>' +
-            shortDescription +
-            "</a></li>" +
-            "</ul>" +
-            "</li>"
+            `<li class="job list-group-item jobListing ${team} ${location} ${commitment} ${department} ${id}">
+                <ul style="padding-left: 0px !important;">
+                    <li class="job-title list-group-item">
+                        ${title}
+                    </li>
+                    <li class="tags">
+                        <span class="department list-group-item">
+                            <a style="color: #999;">
+                                ${department}
+                            </a>
+                        </span>
+                    </li>
+                    <li class="tags">
+                        <span class="location list-group-item">
+                            <a style="color: #999;">
+                                ${location}
+                            </a>
+                        </span>
+                    </li>
+                    <li class="description">
+                        <a>
+                            ${shortDescription}
+                        </a>
+                    </li>
+                </ul>
+            </li>`
         );
 
     }
