@@ -140,7 +140,14 @@ function activateButtonsFromPostings(selector, selectedJobsList, postings) {
 //Functions for checking if the variable is unspecified
 function cleanString(string) {
     if (string) {
-        var cleanString = string.replace(/[\s&]+/gi, "");
+        var cleanString = string.replace(/[\s&]+/gi, (str) => {
+            switch (str) {
+                case "&":
+                    return "Amp"
+                default:
+                    return ""
+            }
+        });
         return cleanString;
     } else {
         return "Uncategorized";
