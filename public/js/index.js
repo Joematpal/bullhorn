@@ -107,21 +107,18 @@ function activateButtons(_data) {
 
 function activateButtonsFromPostings(selector, selectedJobsList, postings) {
     // TODO: check if the selected list is in the postings
-    const list = postings[selectedJobsList]
-    let jobs = $(selector);
 
-    jobs.on("click", "a", function (e) {
+    $(selector).on("click", "a", function (e) {
         e.preventDefault();
-        console.log(selectedJobsList, list)
-        for (let key in  postings[selectedJobsList]) {
-            for (let id in  postings[selectedJobsList][key]) {
+        var jobs = $(".jobs-list");
 
-                var team = nullCheck(id);
-                // console.log("key", key, selectedJobsList)
-                console.log($(this))
-                console.log($(this).hasClass(key))
+        for (let key in postings[selectedJobsList]) {
+            for (let id of postings[selectedJobsList][key]) {
+                key = cleanString(nullCheck(key))
+                let team = cleanString(nullCheck(key));
 
                 if ($(this).hasClass(key)) {
+                    console.log("key", key)
                     if ($(this).hasClass("active")) {
                         $(this).removeClass("active");
                         jobs.find(".job").fadeIn("fast");
@@ -168,19 +165,20 @@ function createJobsFromPostings(postings) {
 
         // var team = nullCheck(id);
         // var department = "";
-        var departmentCleanString = cleanString(department);
+        var departmentCleanString = cleanString(nullCheck(department));
         var location = "";
         var locationCleanString = "";
 
+        let teamButton = `<p class="tags teamCategories" style="padding: 0px 20px; margin: 0px;">
+            <span>
+                <a href="#" class="btn departmentFilterBtn ${departmentCleanString}">
+                    ${department}
+                </a>
+            </span>
+        </p>` 
+
         //Display all job departments in the .jobs-teams div
-        $(".jobs-teams").append(
-            '<p class="tags teamCategories" style="padding: 0px 20px; margin: 0px;"><span><a href="#" class="btn departmentFilterBtn ' +
-            +
-            departmentCleanString +
-            '">' +
-            department +
-            "</a></span></p>"
-        );
+        $(".jobs-teams").append(teamButton);
 
         //Display all job locations in the .jobs-teams div
         // $(".jobs-locations").append(
@@ -224,7 +222,7 @@ function createJobsFromPostings(postings) {
             " " +
             commitment +
             " " +
-            department +  " " + id + " " +
+            department + " " + id + " " +
             '">' +
             '<ul style="padding-left: 0px !important;">' +
             '<li class="job-title list-group-item">' +
