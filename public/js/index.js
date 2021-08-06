@@ -113,26 +113,25 @@ function activateButtonsFromPostings(selector, selectedJobsList, postings) {
         var jobs = $(".jobs-list");
 
         for (let key in postings[selectedJobsList]) {
-            for (let id of postings[selectedJobsList][key]) {
-                key = cleanString(nullCheck(key))
-                let team = cleanString(nullCheck(key));
+            key = cleanString(nullCheck(key))
 
-                if ($(this).hasClass(key)) {
-                    console.log("key", key)
-                    if ($(this).hasClass("active")) {
-                        $(this).removeClass("active");
-                        jobs.find(".job").fadeIn("fast");
-                    } else {
-                        $(".jobs-teams").find("a").removeClass("active");
-                        $(this).addClass("active");
-                        jobs.find("." + team).fadeIn("fast");
-                        jobs
-                            .find(".job")
-                            .not("." + team)
-                            .fadeOut("fast");
-                    }
+            if ($(this).hasClass(key)) {
+                if ($(this).hasClass("active")) {
+                    $(this).removeClass("active");
+                    jobs.find(".job").fadeIn("fast");
+                } else {
+                    $(".jobs-teams").find("a").removeClass("active");
+                    $(this).addClass("active");
                 }
+                console.log("key", key)
+                console.log($(".jobs-list." + key))
+                jobs.find("." + key).fadeIn("fast");
+                jobs
+                    .find(".job")
+                    .not("." + key)
+                    .fadeOut("fast");
             }
+
         }
     });
 }
@@ -141,7 +140,7 @@ function activateButtonsFromPostings(selector, selectedJobsList, postings) {
 //Functions for checking if the variable is unspecified
 function cleanString(string) {
     if (string) {
-        var cleanString = string.replace(/\s+/gi, "");
+        var cleanString = string.replace(/[\s&]+/gi, "");
         return cleanString;
     } else {
         return "Uncategorized";
@@ -175,7 +174,7 @@ function createJobsFromPostings(postings) {
                     ${department}
                 </a>
             </span>
-        </p>` 
+        </p>`
 
         //Display all job departments in the .jobs-teams div
         $(".jobs-teams").append(teamButton);
@@ -201,17 +200,13 @@ function createJobsFromPostings(postings) {
                 .slice(1574)
                 .substring(0, 250)
                 .replace("\n", " ") + "...";
-        var location = nullCheck(posting.categories.location);
+
+        var location = cleanString(nullCheck(posting.categories.location))
         // var locationCleanString = cleanString(location);
-        var commitment = nullCheck(posting.categories.commitment);
-        // var commitmentCleanString = cleanString(commitment);
-        var team = nullCheck(posting.categories.team);
-        // var teamCleanString = cleanString(team);
-        // var link = posting.hostedUrl + leverParameter;
-        // var applyLink = posting.applyUrl + leverParameter;
-        var department = nullCheck(posting.categories.department);
-        // var departmentCleanString = cleanString(department);
-        // var additionalText = nullCheck(posting.additional);
+        var commitment = cleanString(nullCheck(posting.categories.commitment))
+        var team = cleanString(nullCheck(posting.categories.team))
+
+        var department = cleanString(nullCheck(posting.categories.department))
 
         //Append each job posting to the #jobs div
         $("#jobs").append(
